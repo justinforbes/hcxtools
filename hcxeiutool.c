@@ -9,6 +9,8 @@
 #include <unistd.h>
 
 #include "include/hcxeiutool.h"
+#include "include/strings.c"
+#include "include/fileops.c"
 
 /*===========================================================================*/
 /* global variable */
@@ -80,40 +82,6 @@ if(fh_cslist != NULL)
 return;
 }
 /*===========================================================================*/
-/*===========================================================================*/
-static inline size_t chop(char *buffer, size_t len)
-{
-static char *ptr;
-
-ptr = buffer +len -1;
-while(len)
-	{
-	if (*ptr != '\n') break;
-	*ptr-- = 0;
-	len--;
-	}
-while(len)
-	{
-	if (*ptr != '\r') break;
-	*ptr-- = 0;
-	len--;
-	}
-return len;
-}
-/*---------------------------------------------------------------------------*/
-static inline int fgetline(FILE *inputstream, size_t size, char *buffer)
-{
-static size_t len;
-static char *buffptr;
-
-if(feof(inputstream)) return -1;
-buffptr = fgets (buffer, size, inputstream);
-if(buffptr == NULL) return -1;
-len = strlen(buffptr);
-len = chop(buffptr, len);
-return len;
-}
-/*===========================================================================*/
 static void processwordlist(FILE *fh_in)
 {
 static int len;
@@ -157,7 +125,7 @@ fprintf(stdout, "%s %s (C) %s ZeroBeat\n"
 	"--version        : show version\n"
 	"\n"
 	"example:\n"
-	"$ hcxdumptool -i <interface> -o dump.pcapng --enable_status=31\n"
+	"$ hcxdumptool -i <interface> -w dump.pcapng\n"
 	"$ hcxpcapngtool -o hash.22000 -E elist dump.pcapng\n"
 	"$ hcxeiutool -i elist -d digitlist -x xdigitlist -c charlist -s sclist\n"
 	"$ cat elist digitlist xdigitlist charlist sclist > wordlisttmp\n"

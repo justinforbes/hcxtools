@@ -23,6 +23,8 @@
 
 #include "include/hcxpmktool.h"
 #include "include/ieee80211.h"
+#include "include/strings.c"
+#include "include/fileops.c"
 
 /*===========================================================================*/
 /* global variable */
@@ -43,9 +45,9 @@ static uint8_t pmkidcalculated[128];
 static uint8_t ptkcalculated[256];
 static uint8_t miccalculated[128];
 
-static size_t psklen;
+static int psklen;
 static char *pskstring;
-static size_t essidlen;
+static ssize_t essidlen;
 static uint8_t essid[34];
 static uint8_t macap[8];
 static uint8_t macclient[8];
@@ -120,10 +122,10 @@ if((status & HAS_MIC) == HAS_MIC)
 	if(keyversion == 2) fprintf(stdout, "KEY VERSION.: WPA2\n");
 	else if(keyversion == 1) fprintf(stdout, "KEY VERSION.: WPA1\n");
 	else if(keyversion == 3) fprintf(stdout, "KEY VERSION.: WPA2 KEY VERSION 3\n");
-	fprintf(stdout, "NONCE AP....: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n",
+	fprintf(stdout, "NONCE 1.....: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n",
 	anonce[0], anonce[1], anonce[2], anonce[3], anonce[4], anonce[5], anonce[6], anonce[7], anonce[8], anonce[9], anonce[10], anonce[11], anonce[12], anonce[13], anonce[14], anonce[15],
 	anonce[16], anonce[17], anonce[18], anonce[19], anonce[20], anonce[21], anonce[22], anonce[23], anonce[24], anonce[25], anonce[26], anonce[27], anonce[28], anonce[29], anonce[30], anonce[31]);
-	fprintf(stdout, "NONCE CLIENT: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n",
+	fprintf(stdout, "NONCE 2.....: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n",
 	wpak->nonce[0], wpak->nonce[1], wpak->nonce[2], wpak->nonce[3], wpak->nonce[4], wpak->nonce[5], wpak->nonce[6], wpak->nonce[7], wpak->nonce[8], wpak->nonce[9], wpak->nonce[10], wpak->nonce[11], wpak->nonce[12], wpak->nonce[13], wpak->nonce[14], wpak->nonce[15],
 	wpak->nonce[16], wpak->nonce[17], wpak->nonce[18], wpak->nonce[19], wpak->nonce[20], wpak->nonce[21], wpak->nonce[22], wpak->nonce[23], wpak->nonce[24], wpak->nonce[25], wpak->nonce[26], wpak->nonce[27], wpak->nonce[28], wpak->nonce[29], wpak->nonce[30], wpak->nonce[31]);
 	if((status & HAS_PTK_CALC) == HAS_PTK_CALC)
@@ -288,51 +290,11 @@ status |= HAS_PMK_CALC;
 return true;
 }
 /*===========================================================================*/
-static size_t hex2bin(const char *str, uint8_t *bytes, size_t blen)
-{
-size_t pos;
-uint8_t idx0;
-uint8_t idx1;
-
-uint8_t hashmap[] =
-{
-0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, // 01234567
-0x08, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // 89:;<=>?
-0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x00, // @ABCDEFG
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // HIJKLMNO
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // PQRSTUVW
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // XYZ[\]^_
-0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x00, // `abcdefg
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // hijklmno
-};
-memset(bytes, 0, blen);
-pos = 0;
-while(str[pos+0] != 0)
-	{
-	if(str[pos+0] < '0') return 0;
-	if(str[pos+0] > 'f') return 0;
-	if((str[pos+0] > '9') && (str[pos+0] < 'A')) return 0;
-	if((str[pos+0] > 'F') && (str[pos+0] < 'a')) return 0;
-	if(str[pos+1] < '0') return 0;
-	if(str[pos+1] > 'f') return 0;
-	if((str[pos+1] > '9') && (str[pos+1] < 'A')) return 0;
-	if((str[pos+1] > 'F') && (str[pos+1] < 'a')) return 0;
-	idx0 = ((uint8_t)str[pos+0] & 0x1F) ^ 0x10;
-	idx1 = ((uint8_t)str[pos+1] & 0x1F) ^ 0x10;
-	bytes[pos/2] = (uint8_t)(hashmap[idx0] << 4) | hashmap[idx1];
-	pos += 2;
-	if(str[pos+0] == '*') return pos/2;
-	if(pos/2 > blen) return 0;
-	};
-if((pos %2) != 0) return 0;
-return pos/2;
-}
-/*===========================================================================*/
 static bool parsehashlinestring(char *hashlinestring)
 {
 static size_t hlen;
 static size_t plen;
-static size_t flen;
+static ssize_t flen;
 
 static const char *wpa1 = "WPA*01*";
 static const char *wpa2 = "WPA*02*";
@@ -354,9 +316,8 @@ if(memcmp(wpa1, hashlinestring, 7) == 0)
 	if(flen != 6) return false;
 	plen += flen *2;
 	if(hashlinestring[plen++] != '*') return false;
-	essidlen = 0;
 	essidlen = hex2bin(&hashlinestring[plen], essid, 34);
-	if((essidlen == 0) || (essidlen > 32)) return false;
+	if((essidlen <= 0) || (essidlen > 32)) return false;
 	plen += essidlen *2;
 	if(hashlinestring[plen++] != '*') return false;
 	status |= HAS_PMKID_LINE;
@@ -380,16 +341,23 @@ if(memcmp(wpa2, hashlinestring, 7) == 0)
 	if(flen != 6) return false;
 	plen += flen *2;
 	if(hashlinestring[plen++] != '*') return false;
-	essidlen = 0;
-	essidlen = hex2bin(&hashlinestring[plen], essid, 34);
-	if((essidlen == 0) || (essidlen > 32)) return false;
+	flen = getfieldlen(&hashlinestring[plen], 34);
+	if((flen %2) != 0) return false;
+	flen /= 2;
+	if((flen <= 0) || (flen > 32)) return false;
+	essidlen = hex2bin(&hashlinestring[plen], essid, flen);
+	if((essidlen <= 0) || (essidlen > 32)) return false;
 	plen += essidlen *2;
 	if(hashlinestring[plen++] != '*') return false;
 	flen = hex2bin(&hashlinestring[plen], anonce, 32);
+	if(flen == -1) return false;
 	plen += flen *2;
 	if(hashlinestring[plen++] != '*') return false;
-	eapollen = 0;
-	eapollen = hex2bin(&hashlinestring[plen], eapol, 1024);
+	flen = getfieldlen(&hashlinestring[plen], 1024);
+	if((flen %2) != 0) return false;
+	flen /= 2;
+	if((flen <= 0) || (flen > 1024)) return false;
+	eapollen = hex2bin(&hashlinestring[plen], eapol, flen);
 	eapptr = (eapauth_t*)eapol;
 	eapauthlen = ntohs(eapptr->len);
 	if(eapollen < eapauthlen +4) return false;
@@ -405,39 +373,6 @@ if(memcmp(wpa2, hashlinestring, 7) == 0)
 	return true;
 	}
 return false;
-}
-/*===========================================================================*/
-static size_t chop(char *buffer, size_t len)
-{
-static char *ptr;
-
-ptr = buffer +len -1;
-while(len)
-	{
-	if (*ptr != '\n') break;
-	*ptr-- = 0;
-	len--;
-	}
-while(len)
-	{
-	if (*ptr != '\r') break;
-	*ptr-- = 0;
-	len--;
-	}
-return len;
-}
-/*---------------------------------------------------------------------------*/
-static size_t fgetline(FILE *inputstream, size_t size, char *buffer)
-{
-static size_t len;
-static char *buffptr;
-
-if(feof(inputstream)) return 0;
-buffptr = fgets (buffer, size, inputstream);
-if(buffptr == NULL) return 0;
-len = strlen(buffptr);
-len = chop(buffptr, len);
-return len;
 }
 /*===========================================================================*/
 static bool evpdeinitwpa(void)
@@ -485,7 +420,7 @@ char sha256[] = "sha256";
 paramssha256[0] = OSSL_PARAM_construct_utf8_string("digest", sha256, 0);
 paramssha256[1] = OSSL_PARAM_construct_end();
 
-char aes[] = "aes-1280-cbc";
+char aes[] = "aes-128-cbc";
 paramsaes128[0] = OSSL_PARAM_construct_utf8_string("cipher", aes, 0);
 paramsaes128[1] = OSSL_PARAM_construct_end();
 
@@ -640,7 +575,7 @@ if(pskstring != NULL)
 				{
 				while(1)
 					{
-					if((psklen = fgetline(stdin, 128, pskbuffer)) == 0) break;
+					if((psklen = fgetline(stdin, 128, pskbuffer)) == -1) break;
 					if((psklen < 8) || (psklen > 63)) continue;
 						{
 						if(genpmk(pskbuffer) == false)
@@ -675,7 +610,7 @@ if(pskstring != NULL)
 					{
 					while(1)
 						{
-						if((psklen = fgetline(stdin, 128, pskbuffer)) == 0) break;
+						if((psklen = fgetline(stdin, 128, pskbuffer)) == -1) break;
 						if((psklen < 8) || (psklen > 63)) continue;
 						if(genpmk(pskbuffer) == false) exit(EXIT_FAILURE);
 						if(genptkwpa12() == false) exit(EXIT_FAILURE);
@@ -698,7 +633,7 @@ if(pskstring != NULL)
 					{
 					while(1)
 						{
-						if((psklen = fgetline(stdin, 128, pskbuffer)) == 0) break;
+						if((psklen = fgetline(stdin, 128, pskbuffer)) == -1) break;
 						if((psklen < 8) || (psklen > 63)) continue;
 						if(genpmk(pskbuffer) == false) exit(EXIT_FAILURE);
 						if(genptkwpa12() == false) exit(EXIT_FAILURE);
@@ -721,7 +656,7 @@ if(pskstring != NULL)
 					{
 					while(1)
 						{
-						if((psklen = fgetline(stdin, 128, pskbuffer)) == 0) break;
+						if((psklen = fgetline(stdin, 128, pskbuffer)) == -1) break;
 						if((psklen < 8) || (psklen > 63)) continue;
 						if(genpmk(pskbuffer) == false) exit(EXIT_FAILURE);
 						if(genptkwpa2kv3() == false) exit(EXIT_FAILURE);
