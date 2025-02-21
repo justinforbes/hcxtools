@@ -9,6 +9,8 @@
 #include <unistd.h>
 
 #include "include/hcxwltool.h"
+#include "include/strings.c"
+#include "include/fileops.c"
 
 /*===========================================================================*/
 /* global variable */
@@ -25,7 +27,7 @@ static void printstraightlower(FILE *fh_out, int len, char *linein)
 {
 static int p,px;
 
-static char lineout[LINEIN_MAX] = {};
+static char lineout[LINEIN_MAX] = { 0 };
 
 px = 0;
 for(p = 0; p < len; p++)
@@ -56,7 +58,7 @@ static void printstraightupper(FILE *fh_out, int len, char *linein)
 {
 static int p, px;
 
-static char lineout[LINEIN_MAX] = {};
+static char lineout[LINEIN_MAX] = { 0 };
 
 px = 0;
 for(p = 0; p < len; p++)
@@ -87,7 +89,7 @@ static void printstraightcapital(FILE *fh_out, int len, char *linein)
 {
 static int p,px;
 
-static char lineout[LINEIN_MAX] = {};
+static char lineout[LINEIN_MAX] = { 0 };
 
 px = 0;
 for(p = 0; p < len; p++)
@@ -126,7 +128,7 @@ return;
 static void printstraigthsweep(FILE *fh_out, int slen, int len, char *linein)
 {
 static int l;
-static char lineout[LINEIN_MAX] = {};
+static char lineout[LINEIN_MAX] = { 0 };
 
 if(len >= slen)
 	{
@@ -187,7 +189,7 @@ static void printxdigitlower(FILE *fh_out, int len, char *linein)
 {
 static int p, pd;
 
-static char lineout[LINEIN_MAX] = {};
+static char lineout[LINEIN_MAX] = { 0 };
 
 pd = 0;
 for(p = 0; p < len; p++)
@@ -218,7 +220,7 @@ static void printxdigitupper(FILE *fh_out, int len, char *linein)
 {
 static int p, pd;
 
-static char lineout[LINEIN_MAX] = {};
+static char lineout[LINEIN_MAX] = { 0 };
 
 pd = 0;
 for(p = 0; p < len; p++)
@@ -268,7 +270,7 @@ return;
 static void printxdigitsweep(FILE *fh_out, int slen, int len, char *linein)
 {
 static int l;
-static char lineout[LINEIN_MAX] = {};
+static char lineout[LINEIN_MAX] = { 0 };
 
 if(len >= slen)
 	{
@@ -296,7 +298,7 @@ return;
 static void handlexdigit(FILE *fh_out, int len, char *linein)
 {
 static int i, o;
-static char lineout[LINEIN_MAX] = {};
+static char lineout[LINEIN_MAX] = { 0 };
 
 o = 0;
 for(i = 0; i < len; i++)
@@ -339,7 +341,7 @@ return;
 static void printdigitsweep(FILE *fh_out, int slen, int len, char *linein)
 {
 static int l;
-static char lineout[LINEIN_MAX] = {};
+static char lineout[LINEIN_MAX] = { 0 };
 
 if(len >= slen)
 	{
@@ -356,7 +358,7 @@ return;
 static void handledigit(FILE *fh_out, int len, char *linein)
 {
 static int i, o;
-static char lineout[LINEIN_MAX] = {};
+static char lineout[LINEIN_MAX] = { 0 };
 
 o = 0;
 for(i = 0; i < len; i++)
@@ -520,43 +522,6 @@ if(len >= 6)
 		return 0;
 		}
 	}
-return len;
-}
-/*===========================================================================*/
-static size_t chop(char *buffer, size_t len)
-{
-static char *ptr;
-
-ptr = buffer +len -1;
-while(len)
-	{
-	if (*ptr != '\n')
-		break;
-	*ptr-- = 0;
-	len--;
-	}
-while(len)
-	{
-	if (*ptr != '\r')
-		break;
-	*ptr-- = 0;
-	len--;
-	}
-return len;
-}
-/*---------------------------------------------------------------------------*/
-static int fgetline(FILE *fh_in, size_t size, char *buffer)
-{
-static size_t len;
-static char *buffptr;
-
-if(feof(fh_in))
-	return -1;
-buffptr = fgets (buffer, size, fh_in);
-if(buffptr == NULL)
-	return -1;
-len = strlen(buffptr);
-len = chop(buffptr, len);
 return len;
 }
 /*===========================================================================*/
