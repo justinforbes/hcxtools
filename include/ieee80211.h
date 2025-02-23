@@ -28,7 +28,7 @@
 #define IEEE80211_STYPE_AUTH		0xb
 #define IEEE80211_STYPE_DEAUTH		0xc
 #define IEEE80211_STYPE_ACTION		0xd
-#define IEEE80211_STYPE_NACK		0xe
+#define IEEE80211_STYPE_NO_ACTION	0xe
 #define IEEE80211_STYPE_MGTRESERVED	0xf
 
 /* control */
@@ -291,20 +291,7 @@ typedef struct qos_frame qos_t;
  */
 struct mac_frame
 {
-#ifdef BIG_ENDIAN_HOST
- unsigned	subtype : 4;
- unsigned	type : 	2;
- unsigned	version : 2;
-
- unsigned	ordered : 1;
- unsigned	prot : 1;
- unsigned	more_data : 1;
- unsigned	power : 1;
- unsigned	retry : 1;
- unsigned	more_frag : 1;
- unsigned	from_ds : 1;
- unsigned	to_ds : 1;
-#else
+#if __BYTE_ORDER == __LITTLE_ENDIAN
  unsigned	version : 2;
  unsigned	type : 	2;
  unsigned	subtype : 4;
@@ -317,6 +304,19 @@ struct mac_frame
  unsigned	more_data : 1;
  unsigned	prot : 1;
  unsigned	ordered : 1;
+#elif __BYTE_ORDER == __BIG_ENDIAN
+ unsigned	subtype : 4;
+ unsigned	type : 	2;
+ unsigned	version : 2;
+
+ unsigned	ordered : 1;
+ unsigned	prot : 1;
+ unsigned	more_data : 1;
+ unsigned	power : 1;
+ unsigned	retry : 1;
+ unsigned	more_frag : 1;
+ unsigned	from_ds : 1;
+ unsigned	to_ds : 1;
 #endif
  uint16_t	duration;
  uint8_t	addr1[6];
@@ -362,9 +362,14 @@ struct ie_tag
 #define	TAG_CHAN	0x03
 #define	TAG_COUNTRY	0x07
 #define	TAG_RSN		0x30
+#define	TAG_MD		0x36
+#define	TAG_FBSST	0x37
 #define	TAG_PAG		0xde
 #define	TAG_VENDOR	0xdd
 #define	TAG_EXT		0xff
+#define	TAG_SSID_OK	0x01
+#define	TAG_CHAN_OK	0x02
+#define	TAG_COUNTRY_OK	0x04
  uint8_t		len;
  uint8_t		data[1];
 } __attribute__((__packed__));
@@ -415,7 +420,7 @@ struct rsnie_tag
 } __attribute__((__packed__));
 typedef struct rsnie_tag rsnie_t;
 #define	RSNIE_SIZE offsetof(rsnie_t, data)
-#define RSNIE_LEN_MIN	20
+#define RSNIE_LEN_MIN	18
 /*===========================================================================*/
 struct wpaie_tag
 {
@@ -931,11 +936,11 @@ typedef struct chap_frame chap_t;
 struct tacacsp_frame
 {
  uint8_t	version;
-#define TACACSP_VERSION 0xc0
+#define TACACSP_VERSION	0xc0
  uint8_t	type;
-#define TACACS_AUTHENTICATION 1
-#define TACACS2_AUTHENTICATION 2
-#define TACACS3_AUTHENTICATION 3
+#define TACACSP_AUTHEN	1
+#define TACACSP_AUTHOR	2
+#define TACACSP_ACCT	3
  uint8_t	sequencenr;
  uint8_t	flags;
  uint32_t	sessionid;
