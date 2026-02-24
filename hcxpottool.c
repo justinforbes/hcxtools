@@ -188,9 +188,12 @@ return false;
 static bool needdelimhexify(size_t flen, u8 *fin)
 {
 static size_t c;
+
+if(fin[0] < 0x21) return true;
+if(fin[flen - 1] < 0x21) return true;
 for(c = 0; c < flen; c++)
 	{
-	if(fin[c] < 0x21) return true;
+	if(fin[c] < 0x20) return true;
 	if(fin[c] == ':') return true;
 	if(fin[c] > 0x7e) return true;
 	}
@@ -200,9 +203,12 @@ return false;
 static bool needhexify(size_t flen, u8 *fin)
 {
 static size_t c;
+
+if(fin[0] < 0x21) return true;
+if(fin[flen - 1] < 0x21) return true;
 for(c = 0; c < flen; c++)
 	{
-	if(fin[c] < 0x21) return true;
+	if(fin[c] < 0x20) return true;
 	if(fin[c] > 0x7e) return true;
 	}
 return false;
@@ -1204,12 +1210,14 @@ fprintf(stdout, "%s %s  (C) %s ZeroBeat\n"
 	"                        format: PMK <tab> ESSID <tab> PSK\n"
 	"                        verify/calculate plain master keys enabled by default\n"
 	"--tabout=<file>      : output tabulator separated file\n"
-	"                        hexified characters < 0x21\n"
+	"                        0x20 at first or last position\n"
+	"                        hexified characters < 0x20\n"
 	"                        hexified characters > 0x7e\n"
 	"--tabspout=<file>    : output tabulator separated file\n"
 	"                        hexified characters < 0x20\n"
 	"                        hexified characters > 0x7e\n"
 	"--tabnhout=<file>    : output tabulator separated file\n"
+	"                        0x20 at first or last position\n"
 	"                        hexified characters < 0x20\n"
 	"                        use with care\n"
 	"--faultyout=<file>   : output faulty lines file\n"
