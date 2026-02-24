@@ -1372,6 +1372,7 @@ if(tabinname != NULL)
 	}
 if(jtrpotinname != NULL)
 	{
+	pmkoff = false;
 	if(readjtrpotfile(jtrpotinname) == false)
 		{
 		fprintf(stderr, "failed to read %s\n", jtrpotinname);
