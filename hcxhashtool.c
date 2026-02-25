@@ -276,12 +276,12 @@ if(filteressidregexptr != NULL)		fprintf(stdout, "filter by ESSID RegEx.........
 if(flagfiltermacap == true)
 	{
 	vendor = getvendor(filtermacap);
-	fprintf(stdout, "filter by MAC.................: %02x%02x%02x%02x%02x%02x (%s)\n", filtermacap[0], filtermacap[1], filtermacap[2], filtermacap[3], filtermacap[4], filtermacap[5], vendor);
+	fprintf(stdout, "filter by MAC AP..............: %02x%02x%02x%02x%02x%02x (%s)\n", filtermacap[0], filtermacap[1], filtermacap[2], filtermacap[3], filtermacap[4], filtermacap[5], vendor);
 	}
 if(flagfiltermacclient == true)
 	{
 	vendor = getvendor(filtermacclient);
-	fprintf(stdout, "filter by MAC.................: %02x%02x%02x%02x%02x%02x (%s)\n", filtermacclient[0], filtermacclient[1], filtermacclient[2], filtermacclient[3], filtermacclient[4], filtermacclient[5], vendor);
+	fprintf(stdout, "filter by MAC CLIENT..........: %02x%02x%02x%02x%02x%02x (%s)\n", filtermacclient[0], filtermacclient[1], filtermacclient[2], filtermacclient[3], filtermacclient[4], filtermacclient[5], vendor);
 	}
 
 if(flagfilterouiap == true)
@@ -2815,6 +2815,11 @@ while((auswahl = getopt_long (argc, argv, short_options, long_options, &index)) 
 			exit(EXIT_FAILURE);
 			}
 		flagfiltermacap = true;
+		if(flagfiltermacclient == true)
+			{
+			fprintf(stderr, "mac-ap allowed in combination with mac-client\n");
+			exit(EXIT_FAILURE);
+			}
 		break;
 
 		case HCX_FILTER_MAC_CLIENT:
@@ -2836,6 +2841,11 @@ while((auswahl = getopt_long (argc, argv, short_options, long_options, &index)) 
 			exit(EXIT_FAILURE);
 			}
 		flagfiltermacclient = true;
+		if(flagfiltermacap == true)
+			{
+			fprintf(stderr, "mac-client allowed in combination with mac-ap\n");
+			exit(EXIT_FAILURE);
+			}
 		break;
 
 		case HCX_FILTER_MAC_LIST_IN:
