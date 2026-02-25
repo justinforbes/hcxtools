@@ -190,8 +190,10 @@ static bool needdelimhexify(size_t flen, u8 *fin)
 static size_t c;
 
 if(fin[0] < 0x21) return true;
+if(fin[0] == ':') return true;
+if(fin[0] > 0x7e) return true;
 if(fin[flen - 1] < 0x21) return true;
-for(c = 0; c < flen; c++)
+for(c = 1; c < flen; c++)
 	{
 	if(fin[c] < 0x20) return true;
 	if(fin[c] == ':') return true;
@@ -205,8 +207,9 @@ static bool needhexify(size_t flen, u8 *fin)
 static size_t c;
 
 if(fin[0] < 0x21) return true;
+if(fin[0] > 0x7e) return true;
 if(fin[flen - 1] < 0x21) return true;
-for(c = 0; c < flen; c++)
+for(c = 1; c < flen; c++)
 	{
 	if(fin[c] < 0x20) return true;
 	if(fin[c] > 0x7e) return true;
