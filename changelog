@@ -1,3 +1,14 @@
+14.04.2026
+==========
+hcxpcapngtool: changed EAPOL AUTH LIMIT for all EAPOL MESSSGES (m1, m2, m3, m4):
+internal = 512 bytes
+22000 = 255 bytes (limited by hashcat)
+37100 = 512 bytes (https://github.com/hashcat/hashcat/pull/4645#issuecomment-4238210610)
+john = 255 bytes (john uses internal ancient hccap format that is limited to en EAPOL LEN of 255 bytes)
+hccapx = 255 bytes (format is limited to en EAPOL LEN of 255 bytes)
+hccap = 255 bytes (format is limited to en EAPOL LEN of 255 bytes)
+
+
 28.03.2026
 ==========
 hcxpcapngtool: changed EAPOL AUTH LIMIT for all EAPOL MESSSGES (m1, m2, m3, m4):
