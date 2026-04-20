@@ -277,6 +277,7 @@ static long int zeroedeapolpskcount;
 static long int zeroedeapolpmkcount;
 static long int pmkidcount;
 static long int pmkidpskcount;
+static long int pmkidpskclientcount;
 static long int pmkidftpskcount;
 static long int pmkidbestcount;
 static long int pmkidroguecount;
@@ -617,6 +618,7 @@ zeroedeapolpskcount = 0;
 zeroedeapolpmkcount = 0;
 pmkidcount = 0;
 pmkidpskcount = 0;
+pmkidpskclientcount = 0;
 pmkidftpskcount = 0;
 pmkidbestcount = 0;
 pmkidroguecount = 0;
@@ -933,6 +935,7 @@ if(pmkiduselesscount > 0)		fprintf(stdout, "RSN PMKID (useless).................
 if(pmkidfaultycount > 0)		fprintf(stdout, "RSN PMKID (faulty).......................: %ld\n", pmkidfaultycount);
 if(pmkidcount > 0)			fprintf(stdout, "RSN PMKID (total)........................: %ld\n", pmkidcount);
 if(pmkidpskcount > 0)			fprintf(stdout, "RSN PMKID PSK ...........................: %ld\n", pmkidpskcount);
+if(pmkidpskclientcount > 0)		fprintf(stdout, "RSN PMKID PSK (CLIENT)...................: %ld\n", pmkidpskclientcount);
 if(pmkidftpskcount > 0)			fprintf(stdout, "RSN PMKID FT-PSK ........................: %ld\n", pmkidftpskcount);
 if(zeroedpmkidpskcount > 0)
 	{
@@ -2932,6 +2935,7 @@ pmkidcount++;
 pmkidpskcount++;
 if((pmkidstatus & PMKID_CLIENT) == PMKID_CLIENT)
 	{
+	pmkidpskclientcount++;
 	if(testfaultypmkid(pmkid) == true) return;
 	}
 if(testpmkid(zeroedpmk, macclient, macap, pmkid) == false)
