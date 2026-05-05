@@ -528,7 +528,6 @@ static void processpmkideapolfile(char *pmkideapolname, int fd_cap)
 {
 static int len;
 static int oflen;
-static int aktread = 1;
 static FILE *fhpmkideapol;
 static uint16_t essidlen;
 static uint16_t noncelen;
@@ -562,7 +561,6 @@ if((fhpmkideapol = fopen(pmkideapolname, "r")) == NULL)
 while(1)
 	{
 	if((len = fgetline(fhpmkideapol, PMKIDEAPOL_LINE_LEN, linein)) == -1) break;
-	aktread++;
 	if(len < 68)
 		{
 		pmkideapolcapskipped++;
