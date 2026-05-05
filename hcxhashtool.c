@@ -197,7 +197,7 @@ johnpmkidwrittencount = 0;
 johneapolwrittencount = 0;
 hccapxwrittencount = 0;
 hccapwrittencount = 0;
-if((hashlist = (hashlist_t*)calloc(hashlistcount, HASHLIST_SIZE)) == NULL) return false;
+if((hashlist = (hashlist_t*)calloc(hashlistcount, HASHLIST_SIZE +1)) == NULL) return false;
 if((ouilist = (ouilist_t*)calloc(ouilistcount, OUILIST_SIZE)) == NULL) return false;
 
 ERR_load_crypto_strings();
@@ -1223,7 +1223,6 @@ static FILE *fh_pmkideapol;
 static hashlist_t *zeiger;
 static hashlist_t *zeiger2;
 static hashlist_t *zeigerbegin;
-static hashlist_t *zeigerend;
 static struct stat statinfo;
 
 if(lcmax == 0) lcmax = pmkideapolcount;
@@ -1239,21 +1238,17 @@ if(pmkideapoloutname != NULL)
 qsort(hashlist, pmkideapolcount, HASHLIST_SIZE, sort_hashlist_by_essid);
 zeigerbegin = hashlist;
 lc = 0;
-for(zeiger = hashlist +1; zeiger < hashlist +pmkideapolcount; zeiger++)
+for(zeiger = hashlist +1; zeiger < hashlist +pmkideapolcount +1; zeiger++)
 	{
-	if(memcmp(zeigerbegin->essid, zeiger->essid, ESSID_LEN_MAX) == 0)
-		{
-		zeigerend = zeiger;
-		lc++;
-		}
+	if(memcmp(zeigerbegin->essid, zeiger->essid, ESSID_LEN_MAX) == 0) lc++;
 	else
 		{
-		if(((zeigerend -zeigerbegin) >= lcmin) && ((zeigerend -zeigerbegin) <= lcmax))
+		if((lc >= lcmin) && (lc <= lcmax))
 			{
-			for(zeiger2 = zeigerbegin; zeiger2 <= zeigerend; zeiger2++) writepmkideapolhashline(fh_pmkideapol, zeiger2);
+			for(zeiger2 = zeigerbegin; zeiger2 < zeiger; zeiger2++) writepmkideapolhashline(fh_pmkideapol, zeiger2);
 			}
-		lc = 0;
 		zeigerbegin = zeiger;
+		lc = 0;
 		}
 	}
 if(fh_pmkideapol != NULL) fclose(fh_pmkideapol);
