@@ -1511,14 +1511,12 @@ static bool writeessidremoved(FILE *fhout, uint8_t essidlen, uint8_t *essid)
 {
 static int pi;
 static int po;
-static int essidlentmp;
 static bool removeflag;
 
 static char essidtmp[PSKSTRING_LEN_MAX] = { 0 };
 
 po = 0;
 removeflag = false;
-essidlentmp = essidlen;
 memset(&essidtmp, 0, PSKSTRING_LEN_MAX);
 for(pi = 0; pi < essidlen; pi++)
 	{
@@ -1527,11 +1525,7 @@ for(pi = 0; pi < essidlen; pi++)
 		essidtmp[po] = essid[pi];
 		po++;
 		}
-	else
-		{
-		essidlentmp--;
-		removeflag = true;
-		}
+	else removeflag = true;
 	}
 writeessidadd(fhout, (char*)essid);
 if(removeflag == true) writeessidadd(fhout, essidtmp);
