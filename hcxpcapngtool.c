@@ -4110,9 +4110,12 @@ static uint8_t *wpakptr;
 static wpakey_t *wpak;
 static eapauth_t *eapauth;
 static uint16_t authlen;
+static uint64_t eaptimegap;
 static pmkid_t *pmkid;
 static uint8_t keyver;
 static uint64_t rc;
+static uint64_t rcgap;
+static uint8_t mpfield;
 
 eapolm1count++;
 eapolmsgcount++;
@@ -4235,6 +4238,39 @@ if(authlen >= (int)(WPAKEY_SIZE +PMKID_SIZE))
 for(zeiger = messagelist; zeiger < messagelist +MESSAGELIST_MAX +1; zeiger++)
 	{
 	if(zeiger->timestamp == 0) break;
+	if((zeiger->message &HS_M2) == HS_M2)
+		{
+		if(memcmp(zeiger->ap, macap, 6) != 0) continue;
+		if(memcmp(zeiger->client, macclient, 6) != 0) continue;
+		if(zeiger->rc >= rc) rcgap = zeiger->rc -rc;
+		else rcgap = rc -zeiger->rc;
+		if(zeiger->rc != myaktreplaycount)
+			{
+			if(rcgap > rcgapmax) rcgapmax = rcgap;
+			}
+		if(rcgap > ncvalue) continue;
+
+		if(eaptimestamp > zeiger->timestamp) eaptimegap = eaptimestamp -zeiger->timestamp;
+		else eaptimegap = zeiger->timestamp -eaptimestamp;
+		if((authlen +EAPAUTH_SIZE) <= EAPOL_AUTHLEN_MAX)
+			{
+			if(myaktreplaycount > 0)
+				{
+				if(zeiger->rc == myaktreplaycount) continue;
+				}
+			if(eaptimegap > eaptimegapmax) eaptimegapmax = eaptimegap;
+			if(eaptimegap <= eapoltimeoutvalue)
+				{
+				mpfield = ST_M12E2;
+				addhandshake(eaptimegap, rcgap, zeiger, messagelist +MESSAGELIST_MAX, keyver, mpfield);
+				if(donotcleanflag == true)
+					{
+					mpfield = ST_M12E2;
+					addhandshake(eaptimegap, rcgap, zeiger, messagelist +MESSAGELIST_MAX, keyver, mpfield);
+					}
+				}
+			}
+		}
 	if(((zeiger->message &HS_M1) != HS_M1) && ((zeiger->message &HS_M3) != HS_M3)) continue;
 	if(memcmp(zeiger->ap, macap, 6) != 0) continue;
 	if(memcmp(zeiger->client, macclient, 6) != 0) continue;
