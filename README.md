@@ -103,9 +103,9 @@ However, if you have that knowledge this tools can do magic.
 * Detailed knowledge of key derivation functions.
 * Detailed knowledge of NMEA 0183 protocol.
 * Detailed knowledge of Linux
-* Operating system: Linux (recommended: kernel >= 6.4, mandatory: kernel >= 5.10)
+* Operating system: Linux (latest longterm or stable [kernel](https://www.kernel.org), mandatory >= 5.15)
 * Recommendation: Arch Linux (notebooks and desktop systems), OpenWRT (small systems like Raspberry Pi, WiFi router)
-* gcc >= 13 recommended (deprecated versions are not supported: https://gcc.gnu.org/)
+* gcc >= 16 recommended (deprecated versions are not supported: https://gcc.gnu.org/)
 * libopenssl (>= 3.0) and openssl-dev installed
 * librt and librt-dev installed. (Should be installed by default.)
 * zlib and zlib-dev installed. (For gzip compressed cap/pcap/pcapng files.)
