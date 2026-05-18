@@ -1112,7 +1112,7 @@ if(malformedcount > 5)
 	}
 if((eapolwrittencount +eapolncwrittencount +eapolwrittenhcpxcountdeprecated +eapolncwrittenhcpxcountdeprecated +eapolwrittenhcpcountdeprecated
 	+eapolwrittenjcountdeprecated +pmkidwrittenhcount +pmkidftpskwrittenhcount +pmkidwrittenjcountdeprecated +pmkidwrittencountdeprecated
-	+eapmd5writtencount +eapmd5johnwrittencount +eapleapwrittencount +eapmschapv2writtencount +tacacspwrittencount) == 0)
+	+pmkidclientwrittenhcount +eapmd5writtencount +eapmd5johnwrittencount +eapleapwrittencount +eapmschapv2writtencount +tacacspwrittencount) == 0)
 	{
 	fprintf(stdout, "\nInformation: no hashes written to hash files\n");
 	}
