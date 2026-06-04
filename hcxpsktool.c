@@ -1685,20 +1685,34 @@ static void testattwifi(FILE *fhout, uint8_t essidlen, uint8_t *essid)
 {
 static int k1, k2, k3, k4;
 static const char *attwifi = "ATT-WIFI-";
+static const char *scs = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 static char essidtmp[PSKSTRING_LEN_MAX] = { 0 };
 
 if(essidlen != 13) return;
 if(memcmp(essid, attwifi, 9) != 0) return;
-if((!isdigit((unsigned char)essid[9])) || (!isdigit((unsigned char)essid[10])) || (!isdigit((unsigned char)essid[11])) || (!isdigit((unsigned char)essid[12]))) return;
-for(k1 = 0; k1 < 10; k1++)
-	for(k2 = 0; k2 < 10; k2++)
-		for(k3 = 0; k3 < 10; k3++)
-			for(k4 = 0; k4 < 10; k4++)
-				{
-				snprintf(essidtmp, PSKSTRING_LEN_MAX, "%d%c%d%c%d%c%d%c", k1, essid[9], k2, essid[10], k3, essid[12], k4, essid[11]);
-				writepsk(fhout, essidtmp);
-				}
+if((isdigit((unsigned char)essid[9])) && (isdigit((unsigned char)essid[10])) && (isdigit((unsigned char)essid[11])) && (isdigit((unsigned char)essid[12])))
+	{
+	for(k1 = 0; k1 < 10; k1++)
+		for(k2 = 0; k2 < 10; k2++)
+			for(k3 = 0; k3 < 10; k3++)
+				for(k4 = 0; k4 < 10; k4++)
+					{
+					snprintf(essidtmp, PSKSTRING_LEN_MAX, "%d%c%d%c%d%c%d%c", k1, essid[9], k2, essid[10], k3, essid[12], k4, essid[11]);
+					writepsk(fhout, essidtmp);
+					}
+	}
+else
+	{
+	for(k1 = 0; k1 < 62; k1++)
+		for(k2 = 0; k2 < 62; k2++)
+			for(k3 = 0; k3 < 62; k3++)
+				for(k4 = 0; k4 < 62; k4++)
+					{
+					snprintf(essidtmp, PSKSTRING_LEN_MAX, "%c%c%c%c%c%c%c%c", scs[k1], essid[9], scs[k2], essid[10], scs[k3], essid[12], scs[k4], essid[11]);
+					writepsk(fhout, essidtmp);
+					}
+	}
 return;
 }
 /*===========================================================================*/
