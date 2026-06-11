@@ -915,7 +915,7 @@ else
 if(eapolaplesscount > 0)		fprintf(stdout, "EAPOL ROGUE pairs........................: %ld\n", eapolaplesscount);
 if(eapolwrittencount > 0)		fprintf(stdout, "EAPOL pairs written to 22000 hash file...: %ld (RC checked)\n", eapolwrittencount);
 if(eapolncwrittencount > 0)		fprintf(stdout, "EAPOL pairs written to 22000 hash file...: %ld (RC not checked)\n", eapolncwrittencount);
-if(eapolnotwrittencount > 0)		fprintf(stdout, "EAPOL pairs ignored (oversized)...........: %ld (RC checked)\n", eapolnotwrittencount);
+if(eapolnotwrittencount > 0)		fprintf(stdout, "EAPOL pairs ignored (oversized)..........: %ld (RC checked)\n", eapolnotwrittencount);
 if(eapolftpskwrittencount > 0)		fprintf(stdout, "EAPOL pairs written to 37100 hash file...: %ld (RC checked)\n", eapolftpskwrittencount);
 if(eapolftpskncwrittencount > 0)	fprintf(stdout, "EAPOL pairs written to 37100 hash file...: %ld (RC not checked)\n", eapolftpskncwrittencount);
 if(eapolwrittenhcpxcountdeprecated > 0)	fprintf(stdout, "EAPOL pairs written (hccapx).............: %ld (RC checked)\n", eapolwrittenhcpxcountdeprecated);
@@ -923,8 +923,8 @@ if(eapolncwrittenhcpxcountdeprecated > 0)	fprintf(stdout, "EAPOL pairs written (
 if(eapolnotwrittenhcpxcountdeprecated > 0)	fprintf(stdout, "EAPOL pairs not written (hccapx).........: %ld\n", eapolnotwrittenhcpxcountdeprecated);
 if(eapolwrittenhcpcountdeprecated > 0)	fprintf(stdout, "EAPOL pairs written (hccap)..............: %ld (RC checked)\n", eapolwrittenhcpcountdeprecated);
 if(eapolnotwrittenhcpcountdeprecated > 0)	fprintf(stdout, "EAPOL pairs not written (hccap)..........: %ld)\n", eapolnotwrittenhcpcountdeprecated);
-if(eapolwrittenjcountdeprecated > 0)	fprintf(stdout, "EAPOL pairs written (JtR).................: %ld (RC checked)\n", eapolwrittenjcountdeprecated);
-if(eapolnotwrittenjcountdeprecated > 0)	fprintf(stdout, "EAPOL pairs not wirtten (JtR)...............: %ld (RC checked)\n", eapolnotwrittenjcountdeprecated);
+if(eapolwrittenjcountdeprecated > 0)	fprintf(stdout, "EAPOL pairs written (JtR)................: %ld (RC checked)\n", eapolwrittenjcountdeprecated);
+if(eapolnotwrittenjcountdeprecated > 0)	fprintf(stdout, "EAPOL pairs not wirtten (JtR)............: %ld (RC checked)\n", eapolnotwrittenjcountdeprecated);
 if(eapolm12e2count > 0)			fprintf(stdout, "EAPOL M12E2 (challenge - ANONCE from M1).: %ld\n", eapolm12e2count);
 if(eapolm32e2count > 0)			fprintf(stdout, "EAPOL M32E2 (authorized - ANONCE from M3): %ld\n", eapolm32e2count);
 if(eapolm14e4count > 0)			fprintf(stdout, "EAPOL M14E4 (authorized).................: %ld\n", eapolm14e4count);
