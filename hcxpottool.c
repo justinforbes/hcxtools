@@ -578,6 +578,24 @@ fclose(fh_potfile);
 return;
 }
 /*===========================================================================*/
+static bool selftest(void)
+{
+static int tstpsklen = 8;
+static int tstessidlen = 8;
+static const char tstpsk[] = { "12345678" };
+static const u8 tstessid[] = { "hcxtools" };
+
+static u8 tstpmk[] =
+{
+0x8e, 0x65, 0xab, 0xcf, 0x53, 0xeb, 0x04, 0xb9, 0x75, 0x85, 0xb7, 0xcb, 0x2d, 0x26, 0xf5, 0xae,
+0xcf, 0x82, 0x92, 0xef, 0x37, 0x66, 0x93, 0xd0, 0x5c, 0x82, 0xce, 0xf5, 0x61, 0xad, 0xb6, 0x8f
+};
+static u8 calcpmk[32] = { 0 };
+
+if(PKCS5_PBKDF2_HMAC_SHA1(tstpsk, tstpsklen, tstessid, tstessidlen, 4096, PMKLEN, calcpmk) != 1) return false;
+if(memcmp(tstpmk, calcpmk, PMKLEN) != 0) return false;
+return true;
+}
 /*===========================================================================*/
 static void sortandclean(void)
 {
@@ -1350,6 +1368,11 @@ setbuf(stdout, NULL);
 if(globalinit() == false)
 	{
 	fprintf(stderr, "failed to init lists\n");
+	return EXIT_FAILURE;
+	}
+if(selftest() == false)
+	{
+	fprintf(stderr, "selftest failed\n");
 	return EXIT_FAILURE;
 	}
 if(faultyoutname != NULL)
